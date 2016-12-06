@@ -9,8 +9,7 @@ public class Word : MonoBehaviour {
 	public float secondsforwatch = 0.5f;
 	public bool wordenabled;
 	public int index;
-
-
+	private bool doOnce = true;
 	// Use this for initialization
 	void Start () {
 		GetComponent<Text> ().enabled = false;
@@ -62,11 +61,15 @@ public class Word : MonoBehaviour {
 					if (GetComponent<Text> ().text.Length != 0) {
 						GetComponent<Text> ().text = GetComponent<Text> ().text.Substring (0, GetComponent<Text> ().text.Length - 1);
 					}
-				}
-				else if (c == "\n"[0] || c == "\r"[0]) {
+				} else if (c == "\n" [0] || c == "\r" [0]) {
 					EndRun ();
+				} else {
+					if (doOnce) {
+						GetComponent<Text> ().text = "";
+						doOnce = false;
+					}
+					GetComponent<Text> ().text += ("" + c);
 				}
-				else GetComponent<Text> ().text += (""+c);
 			}
 		}
 	}
@@ -77,6 +80,9 @@ public class Word : MonoBehaviour {
 			EndRun ();
 			//Debug.Log ("endRun");
 		}
+	}
+
+	public void Move(){
 	}
 
 

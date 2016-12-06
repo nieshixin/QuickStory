@@ -3,11 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 public class GameManager : MonoBehaviour {
 	public List<Word> wlist;
 	public GameObject lastshow;
-	public bool gameover;
+	public GameObject AvailableList;
+	public bool gameover = false;
 	private bool once = true;
+	private bool once_2 = true;
+
+	static public string hintStore;
+
 	//GameObject manager;
 	// Use this for initialization
 	void Start () {
@@ -23,10 +29,15 @@ public class GameManager : MonoBehaviour {
 		SortWords(words);
 		wlist = new List<Word>(words);
 
+		//lastshow = GameObject.FindGameObjectWithTag ("Lastshow");
+	//	AvailableList = GameObject.FindGameObjectWithTag ("Finish");
+
+		DisplayHint ();
 	}
 	
 	// Update is called once per frame
 	void Update () {
+		
 		CheckOver ();
 		CallWord ();
 
@@ -68,21 +79,60 @@ public class GameManager : MonoBehaviour {
 
 	public void CheckOver(){
 		Word wo = wlist.Find(x => x.wordenabled == true);
+		//if there is no more word in the list, set gameover to true
 		if(!(wo is Word)){
 		     gameover = true;
 				Debug.Log ("GAMEOVER");
+			//
+			CleanHint();
 
-			//only do this chunk once
+			//only do this chunk once,display the last
+
+			//making the final result
 				if(once){
+				if(GameObject.FindGameObjectWithTag("lastshow") != null){
 					foreach (Word wor in wlist) {
 						lastshow.GetComponent<Text> ().enabled = true;
 						lastshow.GetComponent<Text> ().text += wor.context;
 						lastshow.GetComponent<Text> ().text += " ";
-						Debug.Log ("go home");
+						Debug.Log ("Completed the story");
 						once = false;
+					}
+				}
+
+				//this part is actual making the displaylist, not showing, but just mkaing in the end!
+				if (once_2) {
+					if (GameObject.FindGameObjectWithTag ("Finish") != null) {
+
+						foreach (Word wor in wlist) {
+							if (wor.editable) {
+								AvailableList.GetComponent<Text> ().enabled = true;
+
+								AvailableList.GetComponent<Text> ().text += wor.context;
+								AvailableList.GetComponent<Text> ().text += System.Environment.NewLine;
+								AvailableList.GetComponent<Text> ().text += " ";
+
+
+								hintStore += wor.context;
+								hintStore += System.Environment.NewLine;
+								Debug.Log ("Finish Setup");
+								SceneManager.LoadScene ("Menu");
+								once = false;
+							}
+						}
+					}
+					
 				}
 			}
 		}
 	}
 
+	void DisplayHint(){
+			AvailableList.GetComponent<Text> ().enabled = true;
+			AvailableList.GetComponent<Text> ().text += hintStore;
+	}
+
+	void CleanHint(){
+		AvailableList.GetComponent<Text> ().text = "";
+	}
 }
